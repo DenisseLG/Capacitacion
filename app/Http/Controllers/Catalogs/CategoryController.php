@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Catalogs;
 use App\Core\Eloquent\Category;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Requests\CategoryRequest;
+use Facades\App\Core\Facades\AlertCustom;
 
 class CategoryController extends Controller
 {
@@ -15,7 +17,9 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories=Category::paginate(2);  //el modelo Category va a la base y trae todo
+
+        $categories=Category::where('name','ILIKE',
+            "%".request()->get('filter')."%")->paginate(4);  //el modelo Category va a la base y trae todo
         return view('categories.index',compact('categories'));  //si trabajo con with es para renombrar y compact no
 
         //return view('categories.index')->with(['categories'=>Category::all()]); 
@@ -40,9 +44,14 @@ class CategoryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CategoryRequest $request)
     {
-        //
+        //Category::create($request->all());   //acepta todo lo que venga del formulario y guarde en la bd
+        //Category::create($request->only(['name','description']));  //   
+    
+        Category::create($request->validate());   //solo los campos validados se insertan
+        AlertCustom::success('Guardado correctamente');
+        return redirect()->route('categories.index');
     }
 
     /**
@@ -64,7 +73,7 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
-        //
+        return view('categories.edit',compact('category'));
     }
 
     /**
@@ -74,9 +83,12 @@ class CategoryController extends Controller
      * @param  \App\Core\Eloquent\Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Category $category)
+    public function update(CategoryRequest $request, Category $category)
     {
-        //
+        $category->fill($request->validated());
+        $category->save();
+        AlertCustom::success('Actualizado correctamente');
+        return redirect()->route('categories.index');
     }
 
     /**
@@ -87,6 +99,11 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        //
+        $category->delete();
+        AlertCustom::success('Eliminado correctamente');
+        return redirect()->route('categories.index');   // hace eliminacion fisica 
+
+
+
     }
 }

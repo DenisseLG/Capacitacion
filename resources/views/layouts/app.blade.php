@@ -73,7 +73,9 @@
         </nav>
 
         <main class="py-4">
-            @yield('content')
+            @include('partials.alerts')
+            @yield('content')   
+
         </main>
     </div>
 </body>

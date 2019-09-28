@@ -2,6 +2,8 @@
 @extends('layouts.app')
 @section('content')
 
+
+
 <div class="container">
 	<div class="card">
 	  <div class="card-header bg-success text-white">
@@ -13,6 +15,11 @@
 	    <a href="{{ route('categories.create') }}" class="btn btn-primary">AGREGAR</a>
 
 	    <hr/>
+
+	    {!!Form::open(['method'=>,'route'=>'categories.index'])!!}
+			{!! Form::text('filter',request()->get('filter'),['class=>'form-control','placeholder'=>'Ingrese bsucar nombre de categoria'])!!}
+	    {!!Form::close()!!}
+
 
 	    <table class="table ">
 	    	  <thead class="thead-dark">
@@ -28,7 +35,18 @@
 	    			<th>{{$category->id}}</th>
 	    			<th>{{$category->name}}</th>
 	    			<th>{{$category->slug}}</th>
-	    			<th> </th>
+	    			<th>	
+
+	    				{!!Form::open(['route'=>['categories.destroy',$category],
+	    				'method'=>'DELETE',
+	    				'onsubmit'=>'return confirm("Estas seguro que deseas eliminar?")'
+	    				])!!}
+	    				<a href="{{route('categories.edit',$category)}}">EDITAR</a> 
+
+	    				{!!Form::submit('ELIMINAR',['class'=>'btn btn-danger'])!!}
+
+	    				{!!Form::close()!!}
+	    			</th>
 	    		</tr>
 	    	@empty													//si el array esta vavio	
 	    		<tr><td colspan="4">NO HAY REGISTROS</td></tr>
